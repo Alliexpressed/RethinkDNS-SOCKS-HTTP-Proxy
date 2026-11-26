@@ -568,9 +568,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             // server selection; only when RPN AND WireGuard are both active
             // does the tap open the combined proxy settings screen.
             val isRpnOwned = RpnProxyManager.isRpnActive() || RpnProxyManager.hasValidSubscription()
+            // fork: when a socks5 / http / orbot proxy is on as well, open the combined proxy
+            // settings (like settings > proxy) instead of jumping straight into wireguard
+            val hasOtherProxy = appConfig.isCustomSocks5Enabled() || appConfig.isCustomHttpProxyEnabled() || appConfig.isOrbotProxyEnabled()
             when {
-                isRpnOwned && appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY)
+                isRpnOwned && (appConfig.isWireGuardEnabled() || hasOtherProxy) -> startActivity(ScreenType.PROXY)
                 isRpnOwned -> openRpnServerSelection()
+                appConfig.isWireGuardEnabled() && hasOtherProxy -> startActivity(ScreenType.PROXY)
                 appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY_WIREGUARD)
                 else -> startActivity(ScreenType.PROXY)
             }
@@ -1114,20 +1118,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // fork: wireguard is tracked by WireguardManager (not the persisted proxy type), so it
         // can be active together with the custom socks5 / http proxy
-        if (proxyType.isProxyTypeWireguard() || appConfig.isWireGuardEnabled() || RpnProxyManager.isRpnActive()) {
+        if (proxyType.isProxyTypeWireguard() || appConfig.isWireGuardEnabled() || RpnProxyManager.isRpnActive() ||
+            appConfig.isCustomSocks5Enabled() || appConfig.isCustomHttpProxyEnabled()) {
             withContext(Dispatchers.IO) {
                 if (view == null || !isAdded) return@withContext
 
                 val proxies = WireguardManager.getActiveConfigs()
                 val rpnProxies = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getEnabledConfigs() else emptyList()
+                // fork: the custom socks5 / http proxies count towards active / idle / failing too
+                val customIds = buildList {
+                    if (appConfig.isCustomSocks5Enabled()) add(ProxyManager.ID_S5_BASE)
+                    if (appConfig.isCustomHttpProxyEnabled()) add(ProxyManager.ID_HTTP_BASE)
+                }
                 var active = 0
                 var failing = 0
                 var idle = 0
                 val now = System.currentTimeMillis()
-                Logger.v(LOG_TAG_UI, "$TAG active proxies; wg: ${proxies.size}, rpn: ${rpnProxies.size}")
+                Logger.v(LOG_TAG_UI, "$TAG active proxies; wg: ${proxies.size}, rpn: ${rpnProxies.size}, custom: ${customIds.size}")
 
                 // If no proxies are configured but WireGuard/rpn is enabled, show appropriate message
-                if (proxies.isEmpty() && rpnProxies.isEmpty()) {
+                if (proxies.isEmpty() && rpnProxies.isEmpty() && customIds.isEmpty()) {
                     // counts are pending, but the RPN stopped flag is
                     // independent of them
                     val stoppedCount =
@@ -1157,6 +1167,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     failing = triple.second
                     idle = triple.third
                     Logger.v(LOG_TAG_UI, "$TAG rpn proxy status: act: $active, fail: $failing, idle: $idle")
+                }
+
+                customIds.forEach {
+                    val triple = getProxyStatus(it, now, active, failing, idle)
+                    active = triple.first
+                    failing = triple.second
+                    idle = triple.third
+                    Logger.v(LOG_TAG_UI, "$TAG custom proxy $it status: act: $active, fail: $failing, idle: $idle")
                 }
 
                 val isBoth = proxies.isNotEmpty() && rpnProxies.isNotEmpty()
@@ -1191,6 +1209,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(getString(R.string.rpn_title)))
                     } else if (proxies.isNotEmpty()) {
                         b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(getString(R.string.lbl_wireguard)))
+                    } else if (customIds.isNotEmpty()) {
+                        b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(""))
                     } else {
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
@@ -1236,7 +1256,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
         // the headline scrolls (marquee) when long; abbreviate WireGuard so it mostly fits
         val head = if (extras.isEmpty()) base else base.replace(getString(R.string.lbl_wireguard), getString(R.string.lbl_wg_short))
-        return (listOf(head) + extras).joinToString(" + ")
+        return (listOf(head).filter { it.isNotEmpty() } + extras).joinToString(" + ")
     }
 
     /**
