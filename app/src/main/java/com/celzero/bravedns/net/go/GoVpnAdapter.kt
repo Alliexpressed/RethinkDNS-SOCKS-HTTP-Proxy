@@ -1215,8 +1215,9 @@ class GoVpnAdapter : KoinComponent {
         for (id in ids) {
             val st = getProxyStatusById(id).first
             val broken = st == null || st == Backend.TNT || st == Backend.TKO
-            val idle = st == Backend.TZZ
-            if (!broken && !idle) {
+            // idle (TZZ) is not a failure: the engine can report a socks5 / http proxy as idle
+            // while it is carrying traffic, so only a missing / failing proxy is recovered
+            if (!broken) {
                 customProxyStrikes.remove(id)
                 continue
             }
@@ -1229,11 +1230,10 @@ class GoVpnAdapter : KoinComponent {
                     if (id == ProxyManager.ID_S5_BASE) readdSocks5Proxy() else readdHttpProxy()
                     customProxyStrikes[id] = 0
                     logEvent(Severity.LOW, "re-add custom proxy", "re-added $id, status: $st")
-                } else if (broken || strikes >= 12) {
-                    // not responding (or idle for a few minutes): ask the proxy to reset itself
+                } else {
+                    // not responding: ask the proxy to reset itself
                     Logger.w(LOG_TAG_VPN, "$TAG custom proxy $id status $st (strike $strikes), refreshing")
                     getProxies()?.getProxy(id)?.refresh()
-                    if (!broken) customProxyStrikes[id] = 0
                     logEvent(Severity.LOW, "refresh custom proxy", "refreshed $id, status: $st")
                 }
             } catch (e: Exception) {
