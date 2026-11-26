@@ -205,6 +205,10 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun refreshCustomProxyExtras() {
         updateProxyDnsRulesRow()
         updateHttpOnlyRulesRow()
+        // the section (title + card) shows only when one of its rows does
+        b.settingsActivityProxyDnsSection.visibility =
+            if (b.settingsActivityProxyDnsRules.visibility == View.VISIBLE ||
+                b.settingsActivityHttpOnlyRules.visibility == View.VISIBLE) View.VISIBLE else View.GONE
         updateCustomProxyRow(
             appConfig.isCustomSocks5Enabled(),
             ProxyManager.ID_S5_BASE,
@@ -229,7 +233,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     private fun updateHttpOnlyRulesRow() {
         val v = b.settingsActivityHttpOnlyRules
-        if (!appConfig.isCustomHttpProxyEnabled()) {
+        if (!appConfig.isCustomHttpProxyEnabled() && !appConfig.isCustomSocks5Enabled()) {
             v.visibility = View.GONE
             return
         }

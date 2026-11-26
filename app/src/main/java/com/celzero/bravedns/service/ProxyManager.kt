@@ -426,21 +426,29 @@ object ProxyManager : KoinComponent {
      * catch-all wireguard coexist with, ex: a tor or tailscale socks5 proxy. The proxy's own
      * forwarder app is never routed back into the proxy.
      */
-    // fork: true for names that only the http proxy handles (default *.onion, *.i2p)
-    fun isHttpOnlyDomain(domain: String?): Boolean {
-        if (domain.isNullOrBlank() || !appConfig.isCustomHttpProxyEnabled()) return false
-        return ProxyRouteRules.matches(appConfig.getHttpOnlyRules(), null, domain)
+    // fork: names handled only by a custom proxy (default *.onion, *.i2p), resolved by the proxy
+    // itself. the list is shared: it applies to whichever of http / socks5 is enabled (http is
+    // preferred when both are). returns null when the name is not on the list or no proxy is on.
+    fun proxyOnlyIdFor(domain: String?): String? {
+        if (domain.isNullOrBlank()) return null
+        if (!ProxyRouteRules.matches(appConfig.getHttpOnlyRules(), null, domain)) return null
+        return when {
+            appConfig.isCustomHttpProxyEnabled() -> ID_HTTP_BASE
+            appConfig.isCustomSocks5Enabled() -> ID_S5_BASE
+            else -> null
+        }
     }
 
     suspend fun customProxyIdsFor(uid: Int, destIp: String?, domain: String?): List<String> {
         val ids = mutableListOf<String>()
         val pkg = FirewallManager.getPackageNameByUid(uid)
 
-        // http-only names never go to socks5 or wireguard
-        if (isHttpOnlyDomain(domain) &&
-            appConfig.getHttpProxyDetails()?.proxyAppName.let { it.isNullOrEmpty() || it != pkg }
-        ) {
-            return listOf(ID_HTTP_BASE)
+        // proxy-only names go to that one proxy, never to the other proxy or wireguard
+        val only = proxyOnlyIdFor(domain)
+        if (only != null) {
+            val fwd = if (only == ID_HTTP_BASE) appConfig.getHttpProxyDetails()?.proxyAppName
+            else appConfig.getSocks5ProxyDetails()?.proxyAppName
+            if (fwd.isNullOrEmpty() || fwd != pkg) return listOf(only)
         }
 
         if (appConfig.isCustomSocks5Enabled() &&
