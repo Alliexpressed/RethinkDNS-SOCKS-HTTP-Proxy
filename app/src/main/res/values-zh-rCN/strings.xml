@@ -617,7 +617,7 @@
     <string name="settings_network_all_networks_desc">启用时， Rethink 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的任何网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="false">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
     <string name="settings_app_list_default_app">无</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="cd_dns_crypt_title">解析器</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="settings_custom_downloader_heading">使用应用内下载器</string>

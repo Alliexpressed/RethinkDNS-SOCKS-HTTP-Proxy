@@ -60,7 +60,8 @@ class Constants {
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1 = "update"
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2 = "blocklists"
 
-        const val RETHINK_PACKAGE = "com.celzero.bravedns"
+        // fork: follows the (changed) application id instead of a hard-coded upstream name
+        val RETHINK_PACKAGE: String = com.celzero.bravedns.BuildConfig.APPLICATION_ID
 
         // url to check if there is update available for on-device blocklist
         const val ONDEVICE_IPDB_UPDATE_CHECK_URL =

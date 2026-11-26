@@ -101,12 +101,16 @@ import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
 import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
@@ -190,6 +194,7 @@ class GoVpnAdapter : KoinComponent {
         setAutoMode()
         setFloodWgMode()
         onLowMemory()
+        startCustomProxyWatchdog()
         // Plus do not throw exception if the dns is not added, so check the status for client err
         val plusDnsStatus = getDnsStatus(Backend.Plus)
         if(plusDnsStatus == null || plusDnsStatus == Transaction.Status.CLIENT_ERROR.id) addMultipleDnsAsPlus()
@@ -1178,6 +1183,65 @@ class GoVpnAdapter : KoinComponent {
         setCustomProxy(appConfig.getTunProxyMode())
     }
 
+    // fork: the wireguard / rpn proxies are refreshed or re-added when they stop responding, the
+    // custom socks5 / http proxies (ex: tailsocks) were not, so once one went idle / failing it
+    // stayed that way until the vpn was restarted. this watchdog does the same for them.
+    @Volatile private var customProxyWatchdog: Job? = null
+    private val customProxyStrikes = ConcurrentHashMap<String, Int>()
+
+    private fun startCustomProxyWatchdog() {
+        if (customProxyWatchdog?.isActive == true) return
+        customProxyWatchdog =
+            externalScope.launch(Dispatchers.IO) {
+                while (isActive && tunnel.isConnected) {
+                    delay(CUSTOM_PROXY_CHECK_MS)
+                    try {
+                        recoverCustomProxies()
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_VPN, "$TAG custom proxy watchdog: ${e.message}", e)
+                    }
+                }
+                customProxyStrikes.clear()
+            }
+    }
+
+    suspend fun recoverCustomProxies() {
+        if (!tunnel.isConnected) return
+        val ids = buildList {
+            if (appConfig.isCustomSocks5Enabled()) add(ProxyManager.ID_S5_BASE)
+            if (appConfig.isCustomHttpProxyEnabled()) add(ProxyManager.ID_HTTP_BASE)
+        }
+        customProxyStrikes.keys.retainAll(ids.toSet())
+        for (id in ids) {
+            val st = getProxyStatusById(id).first
+            val broken = st == null || st == Backend.TNT || st == Backend.TKO
+            val idle = st == Backend.TZZ
+            if (!broken && !idle) {
+                customProxyStrikes.remove(id)
+                continue
+            }
+            val strikes = (customProxyStrikes[id] ?: 0) + 1
+            customProxyStrikes[id] = strikes
+            try {
+                if (broken && (st == null || strikes >= 3)) {
+                    // missing from the tunnel, or still failing after refreshes: add it again
+                    Logger.w(LOG_TAG_VPN, "$TAG custom proxy $id status $st (strike $strikes), re-adding")
+                    if (id == ProxyManager.ID_S5_BASE) readdSocks5Proxy() else readdHttpProxy()
+                    customProxyStrikes[id] = 0
+                    logEvent(Severity.LOW, "re-add custom proxy", "re-added $id, status: $st")
+                } else if (broken || strikes >= 4) {
+                    // not responding (or idle for a while): ask the proxy to reset itself
+                    Logger.w(LOG_TAG_VPN, "$TAG custom proxy $id status $st (strike $strikes), refreshing")
+                    getProxies()?.getProxy(id)?.refresh()
+                    if (!broken) customProxyStrikes[id] = 0
+                    logEvent(Severity.LOW, "refresh custom proxy", "refreshed $id, status: $st")
+                }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG err recovering custom proxy $id: ${e.message}", e)
+            }
+        }
+    }
+
     suspend fun readdSocks5Proxy() {
         setSocks5TunnelModeIfNeeded(appConfig.getTunProxyMode())
     }
@@ -1459,6 +1523,7 @@ class GoVpnAdapter : KoinComponent {
             // refresh proxies should never return error/exception
             val res = getProxies()?.refreshProxies()
             Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, mobile? $isMobileActive, ssid? $ssid")
+            recoverCustomProxies() // fork: socks5 / http too, before the wireguard-only early return
             // re-add the proxies if the not available in the tunnel
             val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
             val rpnConfigs: Set<CountryConfig> = RpnProxyManager.getEnabledConfigs()
@@ -2469,6 +2534,9 @@ class GoVpnAdapter : KoinComponent {
     companion object {
 
         private const val TAG = "TunAdapter;"
+
+        // fork: how often the custom socks5 / http proxies are health-checked
+        private const val CUSTOM_PROXY_CHECK_MS = 15_000L
 
         // go-side remote service status values; null handle means gone/unknown (stopped)
         const val SVC_OK = 1
