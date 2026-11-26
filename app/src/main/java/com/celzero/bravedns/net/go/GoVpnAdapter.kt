@@ -1223,14 +1223,14 @@ class GoVpnAdapter : KoinComponent {
             val strikes = (customProxyStrikes[id] ?: 0) + 1
             customProxyStrikes[id] = strikes
             try {
-                if (broken && (st == null || strikes >= 3)) {
-                    // missing from the tunnel, or still failing after refreshes: add it again
+                if (broken && (st == null || strikes >= 6)) {
+                    // missing from the tunnel, or still failing after several refreshes: add it again
                     Logger.w(LOG_TAG_VPN, "$TAG custom proxy $id status $st (strike $strikes), re-adding")
                     if (id == ProxyManager.ID_S5_BASE) readdSocks5Proxy() else readdHttpProxy()
                     customProxyStrikes[id] = 0
                     logEvent(Severity.LOW, "re-add custom proxy", "re-added $id, status: $st")
-                } else if (broken || strikes >= 4) {
-                    // not responding (or idle for a while): ask the proxy to reset itself
+                } else if (broken || strikes >= 12) {
+                    // not responding (or idle for a few minutes): ask the proxy to reset itself
                     Logger.w(LOG_TAG_VPN, "$TAG custom proxy $id status $st (strike $strikes), refreshing")
                     getProxies()?.getProxy(id)?.refresh()
                     if (!broken) customProxyStrikes[id] = 0
