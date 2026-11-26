@@ -92,6 +92,7 @@
     <string name="lbl_checking" translatable="false">Checking…</string>
     <string name="lbl_connecting" translatable="false">Connecting…</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_wg_short" translatable="false">WG</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_fast" translatable="true">fast</string>
@@ -1836,10 +1837,10 @@
     <string name="settings_proxy_dns_rules_none" translatable="false">DNS via proxy domains: none (tap to add)</string>
     <string name="settings_proxy_dns_rules_title" translatable="false">DNS via proxy domains</string>
     <string name="settings_proxy_dns_rules_help" translatable="false">One domain per line, ex: *.ts.net. These names are resolved by a separate resolver (default 100.100.100.100, Tailscale) reached through the SOCKS5 / HTTP proxy, so they resolve to private addresses.</string>
-    <string name="settings_proxy_http_only_count" translatable="false">HTTP-proxy-only domains: %1$d (tap to edit)</string>
-    <string name="settings_proxy_http_only_none" translatable="false">HTTP-proxy-only domains: none (tap to add)</string>
-    <string name="settings_proxy_http_only_title" translatable="false">HTTP-proxy-only domains</string>
-    <string name="settings_proxy_http_only_help" translatable="false">One domain per line, ex: *.onion or *.i2p. Lookups for these names are answered locally and the connection goes only to the HTTP proxy, which resolves the name itself. They never use SOCKS5 or WireGuard.</string>
+    <string name="settings_proxy_http_only_count" translatable="false">Proxy-only domains: %1$d (tap to edit)</string>
+    <string name="settings_proxy_http_only_none" translatable="false">Proxy-only domains: none (tap to add)</string>
+    <string name="settings_proxy_http_only_title" translatable="false">Proxy-only domains</string>
+    <string name="settings_proxy_http_only_help" translatable="false">One domain per line, ex: *.onion or *.i2p. Lookups for these names are answered locally and the connection goes only to the HTTP proxy (or the SOCKS5 proxy if HTTP is off), which resolves the name itself. They never use WireGuard.</string>
     <string name="settings_proxy_rules_save" translatable="false">Save</string>
     <string name="settings_proxy_rules_cancel" translatable="false">Cancel</string>
     <string name="settings_proxy_status" translatable="false">Status: %1$s</string>

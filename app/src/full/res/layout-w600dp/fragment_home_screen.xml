@@ -273,9 +273,11 @@
                         android:id="@+id/fhs_card_other_proxy_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
                         android:fontFamily="sans-serif-medium"
-                        android:maxLines="1"
+                        android:singleLine="true"
                         tools:text="WireGuard"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/large_font_text_view" />

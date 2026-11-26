@@ -238,8 +238,8 @@ object TunDnsManager: KoinComponent {
 
         // fork: names matching the proxied-domain dns rules (ex: *.ts.net) are resolved by a
         // dedicated resolver reached through the custom proxy (see GoVpnAdapter)
-        if (uid != rethinkUid && ProxyManager.isHttpOnlyDomain(d.fqdn)) {
-            // answered with a fixed placeholder (alg maps it back to the name for the http proxy)
+        if (uid != rethinkUid && ProxyManager.proxyOnlyIdFor(d.fqdn) != null) {
+            // answered with a fixed placeholder (alg maps it back to the name for the proxy)
             val r = makeDecision(uid, Pair(Backend.Fixed, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_HTTP_ONLY_DNS)
             return checkUserAllowedDnsQtypes(r, d.qtype, d.fid)
         }
@@ -617,7 +617,7 @@ object TunDnsManager: KoinComponent {
         // for rethink over origin internal case, no matter what the proxyId is set, if the
         // transport is set to default in that case, the proxyId will be ignored in firestack
         val pidcsv = if (branch == BRANCH_HTTP_ONLY_DNS) {
-            ProxyManager.ID_HTTP_BASE
+            ProxyManager.proxyOnlyIdFor(domain) ?: Backend.Base
         } else if (tid.first == ProxyManager.DNS_DOMAIN_TID) {
             ProxyManager.proxyForDomainDns(domain) ?: Backend.Base
         } else if (appConfig.getBraveMode().isDnsMode()) {

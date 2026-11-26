@@ -229,7 +229,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     private fun updateHttpOnlyRulesRow() {
         val v = b.settingsActivityHttpOnlyRules
-        if (!appConfig.isCustomHttpProxyEnabled()) {
+        if (!appConfig.isCustomHttpProxyEnabled() && !appConfig.isCustomSocks5Enabled()) {
             v.visibility = View.GONE
             return
         }

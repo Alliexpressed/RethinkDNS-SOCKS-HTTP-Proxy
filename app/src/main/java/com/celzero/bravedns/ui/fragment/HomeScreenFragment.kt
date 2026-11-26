@@ -1194,6 +1194,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     } else {
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
+                    // marquee only scrolls while the view is selected
+                    b.fhsCardOtherProxyCount.isSelected = true
                 }
             }
         } else {
@@ -1232,7 +1234,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (appConfig.isCustomHttpProxyEnabled()) add(getString(R.string.lbl_http))
             if (appConfig.isOrbotProxyEnabled()) add(getString(R.string.orbot))
         }
-        return (listOf(base) + extras).joinToString(" + ")
+        // the headline scrolls (marquee) when long; abbreviate WireGuard so it mostly fits
+        val head = if (extras.isEmpty()) base else base.replace(getString(R.string.lbl_wireguard), getString(R.string.lbl_wg_short))
+        return (listOf(head) + extras).joinToString(" + ")
     }
 
     /**
