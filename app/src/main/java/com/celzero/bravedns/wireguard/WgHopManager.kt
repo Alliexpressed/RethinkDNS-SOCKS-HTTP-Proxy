@@ -37,7 +37,20 @@ object WgHopManager: KoinComponent {
             return maps.size
         }
         maps.clear()
-        maps = CopyOnWriteArrayList(db.getAllWgs())
+        // fork: a relay (src) can hop through only one wireguard. while the hop maps were not
+        // reloaded after a restart (swapped dao queries) every new selection inserted another
+        // row, leaving many copies of the same src -> hop. keep one row per src (the newest
+        // active one) and delete the rest.
+        val all = db.getAllWgs()
+        val keep = all.groupBy { it.src }.map { (_, rows) ->
+            rows.sortedWith(compareByDescending<WgHopMap> { it.isActive }.thenByDescending { it.id }).first()
+        }
+        val keepIds = keep.map { it.id }.toSet()
+        all.filter { it.id !in keepIds }.forEach {
+            Logger.i(LOG_TAG_PROXY, "$TAG load: dropping duplicate hop map ${it.src} -> ${it.hop} (id ${it.id})")
+            db.deleteById(it.id)
+        }
+        maps = CopyOnWriteArrayList(keep)
         printMaps()
         Logger.i(LOG_TAG_PROXY, "$TAG load complete: ${maps.size}")
         return maps.size
