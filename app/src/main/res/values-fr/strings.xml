@@ -287,7 +287,7 @@
     <string name="search_universal_ips"><font size="12">Recherche d’IP</font></string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_bs_status_4">Configuration de Tor-as-a-Proxy (Orbot) en un clic.</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="error_loading_log_file">Erreur de chargement du fichier journal</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="dns_log_dialog_positive">Supprimer les journaux</string>

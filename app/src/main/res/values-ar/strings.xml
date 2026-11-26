@@ -672,7 +672,7 @@
     <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
     <string name="unicode_question_sign" translatable="false">❔</string>
     <string name="connection_http3">HTTP3</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>

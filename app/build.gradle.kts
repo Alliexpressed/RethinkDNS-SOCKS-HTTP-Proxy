@@ -161,7 +161,8 @@ android {
     namespace = "com.celzero.bravedns"
 
     defaultConfig {
-        applicationId = "com.celzero.bravedns"
+        // fork: own package id so this build installs next to (and never updates) upstream Rethink
+        applicationId = "io.github.alliexpressed.rethinkwgsocks"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -680,7 +680,7 @@
     <string name="slide_2_title">Bienvenido</string>
     <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="slide_1_desc">Rethink es un programa de código abierto respaldado por el programa MVP de Mozilla Builders, FOSS United Foundation.</string>
     <string name="firewall_mode_notification_title">¡Protegido! Conectado al Cortafuegos.</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protegido</string>

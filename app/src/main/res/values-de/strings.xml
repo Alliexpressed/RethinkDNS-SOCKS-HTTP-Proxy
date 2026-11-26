@@ -589,7 +589,7 @@
     <string name="about_mail_bugreport_subject">[Rethink]: Fehlerbericht</string>
     <string name="about_mail_bugreport_text">Sende diese E-Mail an: hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">E-Mail-Anbieter auswählen</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
