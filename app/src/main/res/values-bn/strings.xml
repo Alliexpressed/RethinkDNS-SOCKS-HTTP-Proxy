@@ -438,7 +438,7 @@
     <string name="hsf_blocklist_updating_text">সক্ষম করা হচ্ছে…</string>
     <string name="hsf_proxy_chip_removed_toast">প্রক্সি সরানো হয়েছে</string>
     <string name="about_mail_bugreport_text">এই ইমেলটি পাঠান: hello@celzero.com</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s অন্যান্য অ্যাপ(গুলি)</string>
     <string name="ctbs_block_other_apps">%1$s-এর জন্য প্রযোজ্য নিয়মগুলি %2$s অন্যান্য অ্যাপের জন্যও প্রযোজ্য হবে</string>

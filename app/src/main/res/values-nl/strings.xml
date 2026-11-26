@@ -261,7 +261,7 @@
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_bugreport_text">Stuur deze e-mail naar : hello@celzero.com</string>
     <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>

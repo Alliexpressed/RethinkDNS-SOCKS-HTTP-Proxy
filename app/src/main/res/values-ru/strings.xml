@@ -88,7 +88,7 @@
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="dns_explanation_firewall_connected">Подключен к брандмауэру</string>
     <string name="hsf_whats_new_remove_text">Закрытие…</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="app_mode_firewall">Брандмауэр</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">не защищенно</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Подключен к RethinkDNS и брандмауэру</string>

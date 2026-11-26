@@ -528,7 +528,7 @@
     <string name="about_version_install_source" translatable="false">v%1$s (%2$s)</string>
     <string name="cd_dns_proxy_mode_internal">Vidinis</string>
     <string name="about_mail_bugreport_subject">[RethinkDns]: pranešimas apie klaidą</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="error_loading_log_file">Klaida įkeliant žurnalo failą</string>
     <string name="contributors_dialog_title">Autoriai</string>

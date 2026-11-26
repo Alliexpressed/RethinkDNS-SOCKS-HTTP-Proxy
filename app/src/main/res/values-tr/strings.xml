@@ -305,7 +305,7 @@
     <string name="notif_channel_desc_proxy_failure">Proxy hataları ve anomalileri hakkında uyarı</string>
     <string name="rt_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indirin.</string>
     <string name="brbs_restore_title">Geri Yükle</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
     <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>

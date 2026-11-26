@@ -199,7 +199,7 @@
     <string name="unicode_warning_sign" translatable="false">⚠</string>
     <string name="new_app_bulk_notification_title">Perhatian</string>
     <string name="about_settings">Sistem</string>
-    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_github_link" translatable="false">https://github.com/Alliexpressed/rethink-appWG-Socks</string>
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="settings_protocol_translation_dns_inactive">Beralih ke mode DNS/DNS+Firewall untuk mengaktifkan pengaturan ini</string>
     <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
