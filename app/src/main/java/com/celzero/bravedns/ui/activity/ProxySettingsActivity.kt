@@ -161,9 +161,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private fun showRouteRulesDialog(
         proxyName: String,
         current: String,
-        onSave: (String) -> Unit,
         title: String = getString(R.string.settings_proxy_rules_title, proxyName),
         help: String = getString(R.string.settings_proxy_rules_help),
+        onSave: (String) -> Unit,
     ) {
         val input =
             EditText(this).apply {
@@ -241,13 +241,12 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             showRouteRulesDialog(
                 "",
                 appConfig.getDnsRouteRules(),
-                { updated ->
-                    appConfig.setDnsRouteRules(updated)
-                    refreshCustomProxyExtras()
-                },
                 getString(R.string.settings_proxy_dns_rules_title),
                 getString(R.string.settings_proxy_dns_rules_help),
-            )
+            ) { updated ->
+                appConfig.setDnsRouteRules(updated)
+                refreshCustomProxyExtras()
+            }
         }
     }
 
