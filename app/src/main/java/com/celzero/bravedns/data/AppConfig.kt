@@ -562,6 +562,12 @@ internal constructor(
         persistentState.dnsRouteRules = rules
     }
 
+    fun getHttpOnlyRules(): String = persistentState.httpOnlyRules
+
+    fun setHttpOnlyRules(rules: String) {
+        persistentState.httpOnlyRules = rules
+    }
+
     fun getDnsRouteResolver(): String = persistentState.dnsRouteResolver
 
     fun isWireGuardEnabled(): Boolean {

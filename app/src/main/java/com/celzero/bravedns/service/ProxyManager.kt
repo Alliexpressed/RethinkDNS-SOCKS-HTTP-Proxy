@@ -426,9 +426,22 @@ object ProxyManager : KoinComponent {
      * catch-all wireguard coexist with, ex: a tor or tailscale socks5 proxy. The proxy's own
      * forwarder app is never routed back into the proxy.
      */
+    // fork: true for names that only the http proxy handles (default *.onion, *.i2p)
+    fun isHttpOnlyDomain(domain: String?): Boolean {
+        if (domain.isNullOrBlank() || !appConfig.isCustomHttpProxyEnabled()) return false
+        return ProxyRouteRules.matches(appConfig.getHttpOnlyRules(), null, domain)
+    }
+
     suspend fun customProxyIdsFor(uid: Int, destIp: String?, domain: String?): List<String> {
         val ids = mutableListOf<String>()
         val pkg = FirewallManager.getPackageNameByUid(uid)
+
+        // http-only names never go to socks5 or wireguard
+        if (isHttpOnlyDomain(domain) &&
+            appConfig.getHttpProxyDetails()?.proxyAppName.let { it.isNullOrEmpty() || it != pkg }
+        ) {
+            return listOf(ID_HTTP_BASE)
+        }
 
         if (appConfig.isCustomSocks5Enabled() &&
             claimsFlow(uid, ID_S5_BASE, appConfig.getS5RouteRules(), destIp, domain) &&

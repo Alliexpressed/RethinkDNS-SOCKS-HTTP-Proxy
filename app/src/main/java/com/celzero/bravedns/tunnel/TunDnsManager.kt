@@ -78,6 +78,7 @@ object TunDnsManager: KoinComponent {
     internal const val BRANCH_UA_PORT_RULE = "upstream-port-rule"
     internal const val BRANCH_UA_EMPTY_IPCSV = "upstream-empty-ipcsv"
     internal const val BRANCH_UA_DNS_MODE = "upstream-dns-mode"
+    internal const val BRANCH_HTTP_ONLY_DNS = "http-only-dns"
     internal const val BRANCH_PROXY_DOMAIN_DNS = "proxy-domain-dns"
     internal const val BRANCH_UA_FIXED_TRANSPORT = "upstream-fixed-transport"
     internal const val BRANCH_UA_UNKNOWN_APP = "upstream-unknown-app"
@@ -237,6 +238,11 @@ object TunDnsManager: KoinComponent {
 
         // fork: names matching the proxied-domain dns rules (ex: *.ts.net) are resolved by a
         // dedicated resolver reached through the custom proxy (see GoVpnAdapter)
+        if (uid != rethinkUid && ProxyManager.isHttpOnlyDomain(d.fqdn)) {
+            // answered with a fixed placeholder (alg maps it back to the name for the http proxy)
+            val r = makeDecision(uid, Pair(Backend.Fixed, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_HTTP_ONLY_DNS)
+            return checkUserAllowedDnsQtypes(r, d.qtype, d.fid)
+        }
         if (uid != rethinkUid && ProxyManager.proxyForDomainDns(d.fqdn) != null) {
             val r = makeDecision(uid, Pair(ProxyManager.DNS_DOMAIN_TID, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_PROXY_DOMAIN_DNS)
             return checkUserAllowedDnsQtypes(r, d.qtype, d.fid)
@@ -610,7 +616,9 @@ object TunDnsManager: KoinComponent {
         // firestack is already expected to bypass proxies for rethink uid when rinr is false
         // for rethink over origin internal case, no matter what the proxyId is set, if the
         // transport is set to default in that case, the proxyId will be ignored in firestack
-        val pidcsv = if (tid.first == ProxyManager.DNS_DOMAIN_TID) {
+        val pidcsv = if (branch == BRANCH_HTTP_ONLY_DNS) {
+            ProxyManager.ID_HTTP_BASE
+        } else if (tid.first == ProxyManager.DNS_DOMAIN_TID) {
             ProxyManager.proxyForDomainDns(domain) ?: Backend.Base
         } else if (appConfig.getBraveMode().isDnsMode()) {
             Backend.Base
