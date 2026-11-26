@@ -432,6 +432,8 @@ object ProxyManager : KoinComponent {
     fun proxyOnlyIdFor(domain: String?): String? {
         if (domain.isNullOrBlank()) return null
         if (!ProxyRouteRules.matches(appConfig.getHttpOnlyRules(), null, domain)) return null
+        // names resolved through the proxy's own DNS (e.g. *.ts.net) must keep their real answers
+        if (ProxyRouteRules.matches(appConfig.getDnsRouteRules(), null, domain)) return null
         return when {
             appConfig.isCustomHttpProxyEnabled() -> ID_HTTP_BASE
             appConfig.isCustomSocks5Enabled() -> ID_S5_BASE
