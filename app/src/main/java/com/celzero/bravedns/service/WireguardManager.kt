@@ -1381,7 +1381,22 @@ object WireguardManager : KoinComponent {
                 // read the contents of the temp file and write it to the wireguard directory as a plain file
                 val bytes = file.readBytes()
                 Logger.i(LOG_TAG_PROXY, "performRestore: read ${bytes.size} bytes from ${file.name}")
-                val targetFile = File(c.configPath)
+                // fork: the database stores the absolute config path, which includes the app's
+                // package name (/data/user/0/<package>/files/wireguard/..). a backup made under a
+                // different package id points outside this app's storage, so the file could not
+                // be created and the profile was dropped. re-point it into this app's folder.
+                val origFile = File(c.configPath)
+                val filesRoot = applicationContext.filesDir.absolutePath
+                val targetFile =
+                    if (origFile.absolutePath.startsWith(filesRoot + File.separator)) {
+                        origFile
+                    } else {
+                        val moved = File(getConfigFilePath(), origFile.name)
+                        Logger.i(LOG_TAG_PROXY, "performRestore: re-pointing config ${c.id} path ${c.configPath} -> ${moved.absolutePath}")
+                        c.configPath = moved.absolutePath
+                        db.update(c)
+                        moved
+                    }
                 val parentDir = targetFile.parentFile
                 if (parentDir == null) {
                     Logger.e(LOG_TAG_PROXY, "performRestore: wg restore failed, invalid path: ${c.configPath}")
