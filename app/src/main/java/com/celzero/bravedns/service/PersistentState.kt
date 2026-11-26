@@ -259,6 +259,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // socks5 / http proxy, so tailnet names resolve to tailnet ips and not public ones
     var dnsRouteRules by stringPref("proxy_dns_route_rules").withDefault<String>("*.ts.net")
 
+    // fork: names (.onion / .i2p) only the http proxy can reach: dns is answered with a placeholder
+    // (alg) address and the flow is sent only to the http proxy, which resolves the name itself
+    var httpOnlyRules by stringPref("proxy_http_only_rules").withDefault<String>("*.onion\n*.i2p")
+
     var dnsRouteResolver by stringPref("proxy_dns_route_resolver").withDefault<String>("100.100.100.100")
 
     // user selected proxy provider, as of now two providers (custom, orbot)

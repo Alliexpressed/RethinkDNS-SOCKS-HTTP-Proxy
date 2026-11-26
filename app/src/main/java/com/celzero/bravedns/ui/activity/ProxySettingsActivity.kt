@@ -204,6 +204,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     // fork: live status + per-app selection rows for the custom socks5 / http proxies
     private fun refreshCustomProxyExtras() {
         updateProxyDnsRulesRow()
+        updateHttpOnlyRulesRow()
         updateCustomProxyRow(
             appConfig.isCustomSocks5Enabled(),
             ProxyManager.ID_S5_BASE,
@@ -224,6 +225,30 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             { appConfig.getHttpRouteRules() },
             { appConfig.setHttpRouteRules(it) },
         )
+    }
+
+    private fun updateHttpOnlyRulesRow() {
+        val v = b.settingsActivityHttpOnlyRules
+        if (!appConfig.isCustomHttpProxyEnabled()) {
+            v.visibility = View.GONE
+            return
+        }
+        v.visibility = View.VISIBLE
+        val n = ProxyRouteRules.count(appConfig.getHttpOnlyRules())
+        v.text =
+            if (n == 0) getString(R.string.settings_proxy_http_only_none)
+            else getString(R.string.settings_proxy_http_only_count, n)
+        v.setOnClickListener {
+            showRouteRulesDialog(
+                "",
+                appConfig.getHttpOnlyRules(),
+                getString(R.string.settings_proxy_http_only_title),
+                getString(R.string.settings_proxy_http_only_help),
+            ) { updated ->
+                appConfig.setHttpOnlyRules(updated)
+                refreshCustomProxyExtras()
+            }
+        }
     }
 
     private fun updateProxyDnsRulesRow() {
